@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>رحلة زهورتي</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@400;700&family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg1:#1a0f1e;
+    --bg2:#2d1224;
+    --rose:#e8b4bc;
+    --rose-deep:#d98ba0;
+    --gold:#d9b774;
+    --cream:#f6e9e4;
+    --line:rgba(232,180,188,0.25);
+    box-sizing:border-box;
+    padding-top:env(safe-area-inset-top,0px);
+    padding-bottom:env(safe-area-inset-bottom,0px);
+  }
+  *{box-sizing:border-box;}
+  html{scroll-padding-top:env(safe-area-inset-top,0px); height:100%;}
+  body{
+    height:100%;
+    margin:0;
+    font-family:'Tajawal',sans-serif;
+    background:
+      radial-gradient(ellipse at 20% 15%, rgba(217,183,116,0.10), transparent 55%),
+      radial-gradient(ellipse at 80% 85%, rgba(217,139,160,0.14), transparent 55%),
+      linear-gradient(160deg,var(--bg1),var(--bg2));
+    color:var(--cream);
+    overflow:hidden;
+    position:relative;
+  }
+  .scene{
+    position:fixed; inset:0;
+    display:none;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding:32px 22px;
+    padding-top:calc(32px + env(safe-area-inset-top,0px));
+    padding-bottom:calc(32px + env(safe-area-inset-bottom,0px));
+    opacity:0;
+    transition:opacity .7s ease;
+  }
+  .scene.active{display:flex; opacity:1;}
+
+  h1,h2{font-family:'Aref Ruqaa',serif; margin:0; font-weight:700;}
+  .title{font-size:clamp(26px,7vw,42px); color:var(--rose); line-height:1.5;}
+  .sub{font-size:15px; color:var(--cream); opacity:.75; margin-top:14px; max-width:320px; line-height:1.9;}
+
+  .btn{
+    margin-top:34px;
+    background:linear-gradient(135deg,var(--rose-deep),var(--gold));
+    color:#241016;
+    border:none;
+    padding:13px 34px;
+    border-radius:999px;
+    font-family:'Tajawal',sans-serif;
+    font-weight:700;
+    font-size:16px;
+    cursor:pointer;
+    box-shadow:0 8px 24px rgba(217,139,160,.25);
+    transition:transform .25s ease;
+  }
+  .btn:active{transform:scale(.96);}
+  .btn:focus-visible{outline:2px solid var(--gold); outline-offset:3px;}
+
+  input.pw{
+    margin-top:26px;
+    width:min(280px,80vw);
+    padding:13px 18px;
+    border-radius:16px;
+    border:1px solid var(--line);
+    background:rgba(255,255,255,.06);
+    color:var(--cream);
+    font-family:'Tajawal',sans-serif;
+    font-size:16px;
+    text-align:center;
+    outline:none;
+  }
+  input.pw:focus{border-color:var(--rose);}
+  .err{color:var(--rose-deep); font-size:13px; margin-top:10px; min-height:16px;}
+
+  /* gift box */
+  .giftwrap{position:relative; width:150px; height:150px; margin-top:10px; cursor:pointer;}
+  .gift{font-size:110px; line-height:1; transition:transform .35s ease, filter .35s ease; filter:drop-shadow(0 10px 18px rgba(0,0,0,.4));}
+  .giftwrap.opened .gift{transform:scale(1.15) rotate(-4deg); filter:drop-shadow(0 0 26px var(--gold));}
+  .giftwrap:not(.opened):hover .gift{transform:scale(1.05);}
+  .tap-hint{font-size:13px; opacity:.55; margin-top:8px;}
+  .gift-msg{margin-top:20px; opacity:0; transform:translateY(8px); transition:all .6s ease;}
+  .gift-msg.show{opacity:1; transform:translateY(0);}
+
+  .countdown{
+    display:flex; gap:14px; margin-top:22px; flex-wrap:wrap; justify-content:center;
+    opacity:0; transition:opacity .6s ease .3s;
+  }
+  .countdown.show{opacity:1;}
+  .cbox{
+    background:rgba(255,255,255,.06);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:12px 14px;
+    min-width:64px;
+  }
+  .cnum{font-size:22px; font-weight:700; color:var(--gold);}
+  .clabel{font-size:11px; opacity:.7; margin-top:4px;}
+
+  /* reasons */
+  .reasons{display:flex; flex-direction:column; gap:16px; max-width:340px; margin-top:8px;}
+  .reason{
+    opacity:0; transform:translateY(14px);
+    transition:all .6s ease;
+    background:rgba(255,255,255,.05);
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:14px 18px;
+    font-size:15.5px;
+    line-height:1.8;
+  }
+  .reason.show{opacity:1; transform:translateY(0);}
+  .heart-tick{color:var(--rose); margin-inline-start:6px;}
+
+  /* letter */
+  .letter{
+    max-width:360px;
+    font-size:15.5px;
+    line-height:2.1;
+    white-space:pre-wrap;
+    min-height:260px;
+    text-align:right;
+  }
+  .cursor{display:inline-block; width:2px; background:var(--rose); animation:blink 1s step-start infinite; margin-inline-start:2px;}
+  @keyframes blink{50%{opacity:0;}}
+
+  .final-line{font-size:17px; color:var(--rose); margin-top:26px; line-height:1.9; max-width:320px;}
+
+  /* hearts / stars finale */
+  .finale{overflow:hidden;}
+  .float-el{
+    position:absolute; bottom:-10%;
+    animation:rise linear infinite;
+    opacity:.85;
+    filter:drop-shadow(0 0 6px rgba(232,180,188,.4));
+  }
+  @keyframes rise{
+    to{ transform:translateY(-115vh) rotate(20deg); opacity:0;}
+  }
+  .finale-title{font-size:clamp(24px,7vw,36px); color:var(--gold); z-index:2; position:relative;}
+  .finale-sub{font-size:16px; color:var(--cream); margin-top:14px; z-index:2; position:relative;}
+
+  .progress-dot{position:fixed; bottom:calc(14px + env(safe-area-inset-bottom,0px)); left:0; right:0; display:flex; justify-content:center; gap:6px; z-index:3;}
+  .dot{width:6px; height:6px; border-radius:50%; background:rgba(255,255,255,.2);}
+  .dot.on{background:var(--gold);}
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:.001ms !important; transition-duration:.2s !important;}
+  }
+</style>
+</head>
+<body>
+
+<!-- Scene 0: password -->
+<section class="scene active" id="scene-pw">
+  <h1 class="title">🎀 قبل ما نبدأ...</h1>
+  <p class="sub">اكثر حاجة بحبها فيكي؟</p>
+  <input class="pw" id="pwInput" type="text" placeholder="اكتبي الإجابة هنا" autocomplete="off">
+  <div class="err" id="pwErr"></div>
+  <button class="btn" id="pwBtn">دخول ❤️</button>
+</section>
+
+<!-- Scene 1: intro -->
+<section class="scene" id="scene-intro">
+  <h1 class="title" id="introTitle" style="opacity:0;">مستعدة تشوفي قد إيش انتي غالية عندي؟ ❤️</h1>
+  <button class="btn" id="startBtn" style="opacity:0;">ابدئي الرحلة ✨</button>
+</section>
+
+<!-- Scene 2: gift -->
+<section class="scene" id="scene-gift">
+  <div class="giftwrap" id="giftBox">
+    <div class="gift">🎁</div>
+  </div>
+  <div class="tap-hint" id="tapHint">دوسي عليها</div>
+  <div class="gift-msg" id="giftMsg">
+    <h2 style="font-size:20px;color:var(--rose);">كل سنة وانتي أجمل شي صار ليي ❤️</h2>
+  </div>
+  <div class="countdown" id="countdown">
+    <div class="cbox"><div class="cnum" id="cdDays">--</div><div class="clabel">يوم</div></div>
+    <div class="cbox"><div class="cnum" id="cdHours">--</div><div class="clabel">ساعة</div></div>
+    <div class="cbox"><div class="cnum" id="cdMin">--</div><div class="clabel">دقيقة</div></div>
+    <div class="cbox"><div class="cnum" id="cdSec">--</div><div class="clabel">ثانية</div></div>
+  </div>
+  <button class="btn" id="giftNext" style="opacity:0; pointer-events:none;">كملي 💗</button>
+</section>
+
+<!-- Scene 3: reasons -->
+<section class="scene" id="scene-reasons">
+  <h1 class="title" style="margin-bottom:22px;">ليه احبك؟ 💗</h1>
+  <div class="reasons" id="reasonsList"></div>
+  <button class="btn" id="reasonsNext" style="opacity:0; pointer-events:none;">في رسالة ليكي 💌</button>
+</section>
+
+<!-- Scene 4: letter -->
+<section class="scene" id="scene-letter">
+  <h1 class="title" style="font-size:22px; margin-bottom:16px;">رسالة عيد ميلادك 💌</h1>
+  <div class="letter" id="letterText"></div>
+  <button class="btn" id="letterNext" style="opacity:0; pointer-events:none; margin-top:24px;">النهاية 🌙</button>
+</section>
+
+<!-- Scene 5: ending -->
+<section class="scene" id="scene-ending">
+  <h1 class="title">🌙</h1>
+  <p class="final-line">كل سنه وانتي أحلى زهره في حياتيييي ❤️🥹<br><br>لو رجع بيا الزمن من البداية ثاني ... ماكنت راح اختار غيرك</p>
+  <button class="btn" id="finalBtn">اضغطي هنا ❤️</button>
+</section>
+
+<!-- Scene 6: finale -->
+<section class="scene finale" id="scene-finale">
+  <div id="floatLayer"></div>
+  <h1 class="finale-title">Happy Birthday Zihourti 🎂❤️</h1>
+  <p class="finale-sub">أحبك اليوم، وبكرة، وكل يوم</p>
+</section>
+
+<div class="progress-dot" id="dots"></div>
+
+<script>
+(function(){
+  const scenes = ['scene-pw','scene-intro','scene-gift','scene-reasons','scene-letter','scene-ending','scene-finale'];
+  const dotsEl = document.getElementById('dots');
+  scenes.forEach((_,i)=>{ if(i===0) return; const d=document.createElement('div'); d.className='dot'; dotsEl.appendChild(d); });
+
+  function updateDots(idx){
+    const dots = dotsEl.children;
+    for(let i=0;i<dots.length;i++){ dots[i].classList.toggle('on', i===idx-1); }
+    dotsEl.style.display = idx===0 ? 'none':'flex';
+  }
+
+  function goTo(id){
+    scenes.forEach(s=>document.getElementById(s).classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    updateDots(scenes.indexOf(id));
+  }
+
+  // ---- Scene 0: password ----
+  const pwInput = document.getElementById('pwInput');
+  const pwBtn = document.getElementById('pwBtn');
+  const pwErr = document.getElementById('pwErr');
+  function normalize(s){
+    return s.trim()
+      .replace(/[إأآا]/g,'ا')
+      .replace(/ة/g,'ه')
+      .replace(/ى/g,'ي')
+      .replace(/[\u064B-\u0652]/g,'')
+      .toLowerCase();
+  }
+  function checkPw(){
+    const val = normalize(pwInput.value);
+    if(val.includes('خدود')){
+      goTo('scene-intro');
+      setTimeout(()=>{
+        const t = document.getElementById('introTitle');
+        const b = document.getElementById('startBtn');
+        t.style.transition='opacity 1.2s ease';
+        t.style.opacity='1';
+        setTimeout(()=>{ b.style.transition='opacity .8s ease'; b.style.opacity='1'; }, 900);
+      }, 150);
+    } else {
+      pwErr.textContent = 'جربي مره ثانية ❤️';
+      pwInput.style.borderColor = 'var(--rose-deep)';
+    }
+  }
+  pwBtn.addEventListener('click', checkPw);
+  pwInput.addEventListener('keydown', e=>{ if(e.key==='Enter') checkPw(); });
+
+  // ---- Scene 1: intro ----
+  document.getElementById('startBtn').addEventListener('click', ()=> goTo('scene-gift'));
+
+  // ---- Scene 2: gift ----
+  const giftBox = document.getElementById('giftBox');
+  let opened = false;
+  giftBox.addEventListener('click', ()=>{
+    if(opened) return;
+    opened = true;
+    giftBox.classList.add('opened');
+    document.getElementById('tapHint').style.opacity='0';
+    document.getElementById('giftMsg').classList.add('show');
+
+    // countdown to Nov 19 (live)
+    startCountdown();
+    setTimeout(()=> document.getElementById('countdown').classList.add('show'), 300);
+
+    const nb = document.getElementById('giftNext');
+    setTimeout(()=>{ nb.style.transition='opacity .6s ease'; nb.style.opacity='1'; nb.style.pointerEvents='auto'; }, 900);
+  });
+  document.getElementById('giftNext').addEventListener('click', ()=>{
+    goTo('scene-reasons');
+    playReasons();
+  });
+
+  let countdownTimer = null;
+  function startCountdown(){
+    if(countdownTimer) return;
+    function target(){
+      const now = new Date();
+      let t = new Date(now.getFullYear(), 10, 19, 0,0,0);
+      if(t < now) t = new Date(now.getFullYear()+1, 10, 19, 0,0,0);
+      return t;
+    }
+    function tick(){
+      const diff = target() - new Date();
+      const d = Math.floor(diff/(1000*60*60*24));
+      const h = Math.floor((diff/(1000*60*60))%24);
+      const m = Math.floor((diff/(1000*60))%60);
+      const s = Math.floor((diff/1000)%60);
+      document.getElementById('cdDays').textContent = d;
+      document.getElementById('cdHours').textContent = String(h).padStart(2,'0');
+      document.getElementById('cdMin').textContent = String(m).padStart(2,'0');
+      document.getElementById('cdSec').textContent = String(s).padStart(2,'0');
+    }
+    tick();
+    countdownTimer = setInterval(tick, 1000);
+  }
+
+  // ---- Scene 3: reasons ----
+  const reasons = [
+    'عشان بتفهميني بسرعه',
+    'عشان وجودك اهم شي عندي',
+    'عشان صوتك بيطمنّي و احبه مره',
+    'عشان بقيتي حياتي و دنيتي كلها',
+    'وعشان إنتِ زهرتي ❤️'
+  ];
+  let reasonsPlayed = false;
+  function playReasons(){
+    if(reasonsPlayed) return;
+    reasonsPlayed = true;
+    const list = document.getElementById('reasonsList');
+    reasons.forEach((r,i)=>{
+      const div = document.createElement('div');
+      div.className='reason';
+      div.textContent = r;
+      list.appendChild(div);
+      setTimeout(()=> div.classList.add('show'), 300 + i*650);
+    });
+    const nb = document.getElementById('reasonsNext');
+    setTimeout(()=>{ nb.style.transition='opacity .6s ease'; nb.style.opacity='1'; nb.style.pointerEvents='auto'; }, 300 + reasons.length*650 + 300);
+  }
+  document.getElementById('reasonsNext').addEventListener('click', ()=>{
+    goTo('scene-letter');
+    typeLetter();
+  });
+
+  // ---- Scene 4: letter ----
+  const letterMsg = `يا زهوري، كل سنه وانتي أحلى زهره في حياتيييي ❤️🥹
+
+يوم ميلادك عندي مو بس يوم عادي، هذا اليوم اللي انولدت فيه أجمل إنسانة دخلت حياتي، اليوم اللي انولدت فيه زهوري وحبيبتي وقطعة من قلبي ❤️
+
+كل عام وانتي معي، وكل عام وانتي سبب فرحتي وابتسامتي، وكل عام وأنا أحبك أكثر من السنة اللي قبلها. وجودك بحياتي بالنسبة لي نعمة ما أبي أخسرها أبدًا، وأتمنى كل أعياد ميلادك الجاية أكون جنبك وأفرح فيك وأشوفك تكبرين وتحققين كل أحلامك يا أجمل زهره 🌷❤️
+
+مهما كتبت ومهما قلت، ما راح أوصف لك قد إيش انتي غالية علي، انتي مو بس حبيبتي، انتي الشخص اللي قلبي اختاره من بين كل الناس، وأتمنى من قلبي إن ربي يديمك لي ويكتب لنا أيام حلوة كثير مع بعض 🥹❤️
+
+عيد ميلاد سعيد يا زهورتي، ويا أجمل شيء صار لي، أحبك اليوم وبكل يوم أكثر من اللي قبله، وإن شاء الله تكون سنتك الجديدة مليانة فرح وضحكة وتحقيق لكل شيء تتمنينه ❤️🎂🌷`;
+  let letterTyped = false;
+  function typeLetter(){
+    if(letterTyped) return;
+    letterTyped = true;
+    const el = document.getElementById('letterText');
+    const cursor = document.createElement('span');
+    cursor.className='cursor';
+    cursor.textContent='\u00A0';
+    let i=0;
+    function step(){
+      if(i < letterMsg.length){
+        el.textContent = letterMsg.slice(0,i+1);
+        el.appendChild(cursor);
+        i++;
+        setTimeout(step, 18);
+      } else {
+        cursor.remove();
+        const nb = document.getElementById('letterNext');
+        nb.style.transition='opacity .6s ease'; nb.style.opacity='1'; nb.style.pointerEvents='auto';
+      }
+    }
+    step();
+  }
+  document.getElementById('letterNext').addEventListener('click', ()=> goTo('scene-ending'));
+
+  // ---- Scene 5 -> 6 ----
+  document.getElementById('finalBtn').addEventListener('click', ()=>{
+    goTo('scene-finale');
+    spawnFloaters();
+  });
+
+  function spawnFloaters(){
+    const layer = document.getElementById('floatLayer');
+    if(layer.children.length) return;
+    const emojis = ['❤️','✨','🌸','⭐','💗'];
+    for(let i=0;i<26;i++){
+      const s = document.createElement('div');
+      s.className='float-el';
+      s.textContent = emojis[i % emojis.length];
+      s.style.left = Math.random()*94 + '%';
+      s.style.fontSize = (14 + Math.random()*20) + 'px';
+      s.style.animationDuration = (5 + Math.random()*6) + 's';
+      s.style.animationDelay = (Math.random()*6) + 's';
+      layer.appendChild(s);
+    }
+  }
+})();
+</script>
+</body>
+</html>
